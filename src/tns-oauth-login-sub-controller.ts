@@ -44,10 +44,12 @@ export class TnsOAuthLoginSubController {
       codeChallenge = sha256base64encoded(this.client.codeVerifier);
     }
 
-    this.authState = new TnsOAuthState(
-      this.client.codeVerifier, // this could be removed actually
-      completion
-    );
+    // this.authState = new TnsOAuthState(
+    //   this.client.codeVerifier, // this could be removed actually
+    //   completion
+    // );
+
+    this.initializeAuthState(completion);
 
     return getAuthUrlStr(this.client.provider, codeChallenge);
   }
@@ -87,6 +89,15 @@ export class TnsOAuthLoginSubController {
       }
     }
     return codeExchangeUrl;
+  }
+
+  private initializeAuthState(
+    completion: TnsOAuthClientLoginBlock
+  ): void {
+    this.authState = new TnsOAuthState(
+      this.client.codeVerifier,
+      completion
+    )
   }
 
   private codeExchangeWithUrlCompletion(
@@ -153,7 +164,8 @@ export class TnsOAuthLoginSubController {
   ) {
     const loginCompletion: TnsOAuthClientLoginBlock = this.authState
       .loginCompletion;
-    this.authState = null;
+    // this.authState = null;
+    this.initializeAuthState(loginCompletion)
     loginCompletion(tokenResult, responseError);
   }
 }
